@@ -22,15 +22,3 @@ abstract class BaseMessage(
         }
     }
 }
-
-/*
-и абстрактный метод formatMessage() - возвращает строку содержащюю
-
-информацию о id сообщения, имени получателя/отправителя,
-виде сообщения ("получил/отправил") и типе сообщения ("сообщение"/"изображение")
-
-Реализуй паттерн AbstractFactory с методом makeMessage(from, chat, date, type, payload, isIncoming = false) принимающий в качесте аргументов пользователя создавшего сообщение, чат к которому относится сообщение, дата сообщения и его тип ("text/image"), полезную нагрузку
-Пример:
-BaseMessage.makeMessage(user, chat, date, "any text message", "text") //Василий отправил сообщение "any text message" только что
-BaseMessage.makeMessage(user, chat, date, "https://anyurl.com", "image",true) //Василий получил изображение "https://anyurl.com" 2 часа назад
-*/
