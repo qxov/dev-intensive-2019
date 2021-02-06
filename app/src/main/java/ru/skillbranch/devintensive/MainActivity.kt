@@ -3,16 +3,21 @@ package ru.skillbranch.devintensive
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
+import ru.skillbranch.devintensive.extensions.hideKeyboard
 import ru.skillbranch.devintensive.models.Bender
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, TextWatcher, TextView.OnEditorActionListener {
     lateinit var benderImage: ImageView
     lateinit var textTxt: TextView
     lateinit var messageEt: EditText
@@ -24,7 +29,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //benderImage = findViewById(R.id.iv_bender)
         benderImage = iv_bender
         textTxt = tv_text
         messageEt = et_message
@@ -44,6 +48,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         Log.d("qxov_MainActivity $status / $question", "onCreate")
 
         textTxt.text = benderObj.askQuestion()
+        messageEt.addTextChangedListener(this)
+        messageEt.setOnEditorActionListener(this)
     }
 
     override fun onPause() {
@@ -78,16 +84,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     fun applyColorFilter() {
         val (r, g, b) = benderObj.status.color
-        benderImage.setColorFilter(Color.rgb(r, g, b), PorterDuff.Mode.MULTIPLY);
+        benderImage.setColorFilter(Color.rgb(r, g, b), PorterDuff.Mode.MULTIPLY)
+    }
+
+    fun sendAnswer() {
+
+        val phrase = benderObj.listenAnswer(messageEt.text.toString()).first
+        messageEt.setText("")
+        textTxt.text = phrase
+        applyColorFilter()
+        hideKeyboard()
     }
 
     override fun onClick(v: View?) {
         if (v?.id == R.id.iv_send) {
-            val phrase = benderObj.listenAnswer(messageEt.text.toString().toLowerCase()).first
-            messageEt.setText("")
-            textTxt.text = phrase
-            applyColorFilter()
-
+            sendAnswer()
         }
     }
 
@@ -98,4 +109,52 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         outState.putString("benderObj.question.name", benderObj.question.name)
         Log.d("qxov_MainActivity", "onSaveInstanceState ${benderObj.status.name} / ${benderObj.question.name}")
     }
+
+
+    override fun afterTextChanged(s: Editable?) {
+
+    }
+
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+    }
+
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+        val (isValid, message) = benderObj.question.answerTip(messageEt.text.toString())
+
+        if (isValid) {
+            messageEt.error = null
+        } else {
+            messageEt.error = message
+        }
+
+    }
+
+    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        if (v?.id != R.id.et_message)
+            return false
+
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            sendAnswer()
+            return true
+        }
+
+        if(actionId == EditorInfo.IME_ACTION_UNSPECIFIED && event!=null) {
+            if (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER) {
+                return true
+            }
+
+            if (event.action == KeyEvent.ACTION_UP && event.keyCode == KeyEvent.KEYCODE_ENTER) {
+                sendAnswer()
+                return true
+            }
+
+            return false
+        }
+
+        return false
+
+    }
+
 }
+

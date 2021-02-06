@@ -22,25 +22,62 @@ class Bender(
     enum class Question(val question: String, val answers: List<String>) {
         NAME("Как меня зовут?", listOf("бендер", "bender")) {
             override fun nextQuestion(): Question = PROFESSION
+            override fun answerTip(answer: String): Pair<Boolean, String> {
+                return if (answer.isNotEmpty() && answer[0].isUpperCase()) {
+                    Pair(true, "")
+                } else {
+                    Pair(false, "Имя должно начинаться с заглавной буквы")
+                }
+            }
         },
         PROFESSION("Назови мою профессию?", listOf("сгибальщик", "bender")) {
             override fun nextQuestion(): Question = MATERIAL
+            override fun answerTip(answer: String): Pair<Boolean, String> {
+                return if (answer.isNotEmpty() && answer[0].isLowerCase()) {
+                    Pair(true, "")
+                } else {
+                    Pair(false, "Профессия должна начинаться со строчной буквы")
+                }
+            }
         },
+
         MATERIAL("Из чего я сделан?", listOf("металл", "дерево", "iron", "wood", "metal")) {
             override fun nextQuestion(): Question = BDAY
+            override fun answerTip(answer: String): Pair<Boolean, String> {
+                return if (answer.isNotEmpty() && !answer.contains(Regex("[0-9]"))) {
+                    Pair(true, "")
+                } else {
+                    Pair(false, "Материал не должен содержать цифр")
+                }
+            }
         },
         BDAY("Когда меня создали?", listOf("2993")) {
             override fun nextQuestion(): Question = SERIAL
-
+            override fun answerTip(answer: String): Pair<Boolean, String> {
+                return if (answer.isNotEmpty() && !answer.contains(Regex("[^0-9]"))) {
+                    Pair(true, "")
+                } else {
+                    Pair(false, "Год моего рождения должен содержать только цифры")
+                }
+            }
         },
         SERIAL("Мой серийный номер?", listOf("2716057")) {
             override fun nextQuestion(): Question = IDLE
+            override fun answerTip(answer: String): Pair<Boolean, String> {
+                return if (answer.length == 7 && !answer.contains(Regex("[^0-9]"))) {
+                    Pair(true, "")
+                } else {
+                    Pair(false, "Серийный номер содержит только цифры, и их 7")
+                }
+            }
         },
-        IDLE("На этом всё, вопросов больше нет", listOf()) {
+        IDLE("На этом все, вопросов больше нет", listOf()) {
             override fun nextQuestion(): Question = IDLE
+            override fun answerTip(answer: String): Pair<Boolean, String> = Pair(true, "")
         };
 
         abstract fun nextQuestion(): Question
+        abstract fun answerTip(answer: String): Pair<Boolean, String>
     }
 
     fun askQuestion(): String = when (question) {
@@ -50,23 +87,24 @@ class Bender(
         Question.BDAY -> Question.BDAY.question
         Question.SERIAL -> Question.SERIAL.question
         Question.IDLE -> Question.IDLE.question
-
-
     }
 
     fun listenAnswer(answer: String): Pair<String, Triple<Int, Int, Int>> {
-        return if (question.answers.contains(answer)) {
+        val (valid, tip) = question.answerTip(answer)
+
+        if (!valid) {
+            return Pair("$tip\n${question.question}", status.color)
+        }
+
+        if(question==Question.IDLE)
+            return Pair(question.question, status.color)
+
+        return if (question.answers.contains(answer.toLowerCase())) {
             question = question.nextQuestion()
-            Pair(
-                "Отлично - это правильный ответ!\n" +
-                        "${question.question}", status.color
-            )
+            Pair("Отлично - это правильный ответ!\n${question.question}", status.color)
         } else {
             status = status.nextStatus()
-            Pair(
-                "Это неправильный ответ!\n" +
-                        "${question.question}", status.color
-            )
+            Pair("Это неправильный ответ!\n${question.question}", status.color)
         }
     }
 }

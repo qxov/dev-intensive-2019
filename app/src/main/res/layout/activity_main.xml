@@ -44,6 +44,7 @@
             android:layout_weight="1"
             android:hint="@string/enter_text"
             android:importantForAutofill="no"
+            android:imeOptions="actionDone"
             android:inputType="text"
             android:lines="1"
             android:maxLines="1"
