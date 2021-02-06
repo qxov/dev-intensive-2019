@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextWatcher, Tex
         val question = savedInstanceState?.getString("benderObj.question.name") ?: benderObj.question.name
         benderObj.status = Bender.Status.valueOf(status)
         benderObj.question = Bender.Question.valueOf(question)
+        benderObj.tryCnt = savedInstanceState?.getInt("benderObj.tryCnt") ?: benderObj.tryCnt
 
         applyColorFilter()
 
@@ -107,6 +108,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextWatcher, Tex
 
         outState.putString("benderObj.status.name", benderObj.status.name)
         outState.putString("benderObj.question.name", benderObj.question.name)
+        outState.putInt("benderObj.tryCnt", benderObj.tryCnt)
         Log.d("qxov_MainActivity", "onSaveInstanceState ${benderObj.status.name} / ${benderObj.question.name}")
     }
 

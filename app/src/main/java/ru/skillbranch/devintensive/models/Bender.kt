@@ -4,6 +4,8 @@ class Bender(
     var status: Status = Status.NORMAL,
     var question: Question = Question.NAME
 ) {
+    var tryCnt : Int = 0
+
     enum class Status(val color: Triple<Int, Int, Int>) {
         NORMAL(Triple(255, 255, 255)),
         WARNING(Triple(255, 120, 0)),
@@ -101,14 +103,19 @@ class Bender(
 
         return if (question.answers.contains(answer.toLowerCase())) {
             question = question.nextQuestion()
-
-            Pair(
-                "Отлично - ${if (question == Question.IDLE) "ты справился" else "это правильный ответ!"}\n" +
-                        "${question.question}", status.color
-            )
+            tryCnt = 0
+            Pair("Отлично - ты справился\n${question.question}", status.color)
         } else {
-            status = status.nextStatus()
-            Pair("Это неправильный ответ\n${question.question}", status.color)
+            tryCnt++
+            if(tryCnt != 3) {
+                status = status.nextStatus()
+                Pair("Это неправильный ответ\n${question.question}", status.color)
+            } else {
+                status = Status.NORMAL
+                question = Question.NAME
+                tryCnt = 0
+                Pair("Это неправильный ответ. Давай все по новой\n${question.question}", status.color)
+            }
         }
     }
 }
