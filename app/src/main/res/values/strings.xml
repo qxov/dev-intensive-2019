@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Hometask 2</string>
+    <string name="app_name">Hometask 3</string>
+    <string name="enter_text">Введите текст</string>
 </resources>
