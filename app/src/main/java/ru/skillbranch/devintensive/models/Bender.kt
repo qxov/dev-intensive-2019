@@ -103,11 +103,11 @@ class Bender(
 
         return if (question.answers.contains(answer.toLowerCase())) {
             question = question.nextQuestion()
-            tryCnt = 0
+            //tryCnt = 0
             Pair("Отлично - ты справился\n${question.question}", status.color)
         } else {
             tryCnt++
-            if(tryCnt != 3) {
+            if(tryCnt < 3) {
                 status = status.nextStatus()
                 Pair("Это неправильный ответ\n${question.question}", status.color)
             } else {
