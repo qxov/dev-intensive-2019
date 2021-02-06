@@ -96,15 +96,19 @@ class Bender(
             return Pair("$tip\n${question.question}", status.color)
         }
 
-        if(question==Question.IDLE)
+        if (question == Question.IDLE)
             return Pair(question.question, status.color)
 
         return if (question.answers.contains(answer.toLowerCase())) {
             question = question.nextQuestion()
-            Pair("Отлично - это правильный ответ!\n${question.question}", status.color)
+
+            Pair(
+                "Отлично - ${if (question == Question.IDLE) "ты справился" else "это правильный ответ!"}\n" +
+                        "${question.question}", status.color
+            )
         } else {
             status = status.nextStatus()
-            Pair("Это неправильный ответ!\n${question.question}", status.color)
+            Pair("Это неправильный ответ\n${question.question}", status.color)
         }
     }
 }
