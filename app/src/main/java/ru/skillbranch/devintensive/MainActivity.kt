@@ -24,8 +24,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //benderImage = findViewById(R.id.iv_amongus)
-        benderImage = iv_amongus
+        //benderImage = findViewById(R.id.iv_bender)
+        benderImage = iv_bender
         textTxt = tv_text
         messageEt = et_message
 
